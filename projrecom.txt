@@ -1,0 +1,163 @@
+## 最推荐的 3 个项目（按推荐度排序）
+
+---
+
+### 第 1 名：无锁数据结构库 + 微基准测试引擎
+
+__一句话：量化 C++ 面试的"王牌项目"，没有之一__
+
+#### 包含模块
+
+```javascript
+lockfree/
+├── mpmc_bounded_queue.h     // 多生产者多消费者有界队列
+├── spsc_bounded_queue.h     // 单生产者单消费者（最快）
+├── spsc_unbounded_queue.h   // 无界版本（链表实现）
+├── hazard_ptr.h             // Hazard Pointer 安全回收
+├── epoch_based_reclamation.h // EBR 回收
+├── rcu.h                    // RCU 读-拷贝-更新
+├── tagged_ptr.h             // ABA 问题解决方案
+├── memory_barrier_util.h    // 内存序封装
+├── benchmark.h              // 自研微基准框架
+├── latency_histogram.h      // 延迟直方图（RDTSC）
+└── examples/
+    ├── 01_queue_latency_compare.cpp  // 对比各种 queue
+    ├── 02_memory_ordering_demo.cpp   // 展示不同内存序影响
+    └── 03_bench.cpp                  // 完整基准
+```
+
+#### 面试问答覆盖
+
+```javascript
+Q: "MPMC 队列如何保证线程安全？"
+→ 展示：CAS + memory_order_acquire/release + padding
+
+Q: "什么是 ABA 问题？"
+→ 展示：tagged_ptr 的实现
+
+Q: "你的无锁队列比 std::queue + mutex 快多少？"
+→ 展示：benchmark.h 输出的数据 (3-5x)
+
+Q: "为什么 SPSC 比 MPMC 快？"
+→ 展示：单写单读无需 CAS，只用 store/load + 编译屏障
+
+Q: "Hazard Pointer 和 EBR 有什么区别？"
+→ 展示：两者实现，延迟/吞吐/内存开销的 trade-off
+```
+
+__工作量：1000-1500 行 C++17__\
+__面试价值：9/10__（完美覆盖维度 1、2、4）
+
+---
+
+### 第 2 名：自定义内存分配器套件（Memory Allocator Suite）
+
+__一句话：展示你对"零动态分配延迟"的控制力__
+
+#### 包含模块
+
+```javascript
+allocator/
+├── arena_allocator.h         // Arena 分配器，一次性释放
+├── slab_allocator.h          // Slab 分配器，固定大小对象
+├── object_pool.h             // 对象池（量化最常用）
+├── thread_cache_allocator.h  // 线程缓存分配器（如 tcmalloc 简化版）
+├── stack_allocator.h         // 栈分配器（完全无锁）
+├── numa_allocator.h          // NUMA 感知分配
+├── memory_resource.h         // C++17 pmr 兼容封装
+└── examples/
+    ├── 01_allocator_bench.cpp        // 对比 malloc vs 各分配器
+    └── 02_object_pool_demo.cpp       // 演示对象池消除动态分配
+```
+
+#### 面试问答覆盖
+
+```javascript
+Q: "为什么量化交易要自己管理内存？"
+→ malloc 延迟不确定（10ns-1μs 抖动），预分配可消除
+
+Q: "Arena 和 Object Pool 各适合什么场景？"
+→ Arena: 一批消息一起销毁；Object Pool: 固定类型高频创建
+
+Q: "线程缓存分配器怎么实现？"
+→ TLS + 本地缓存 + 全局共享池（展示架构）
+
+Q: "NUMA 感知是什么意思？怎么测试？"
+→ 绑定内存到本地节点的 node，用 lat_numa 工具验证
+```
+
+__工作量：800-1200 行 C++17__\
+__面试价值：8/10__（覆盖维度 2、1）
+
+---
+
+### 第 3 名：SIMD 加速的二进制协议解析器
+
+__一句话：展示你懂"如何从 wire 上 100ns 内拿到数据"__
+
+#### 包含模块
+
+```javascript
+parser/
+├── binary_reader.h           // 二进制读取器（小端/大端处理）
+├── simd_json_scanner.h       // SIMD 快速 JSON tokenizer（参考 simdjson）
+├── bitpack_unpack.h          // 位压缩/解压（量化原始行情用）
+├── varint_encoder.h          // Varint 编码
+├── schema_generated.h        // FlatBuffers 风格预定义 schema
+├── parser_bench.h            // 解析性能基准
+└── examples/
+    ├── 01_json_vs_binary.cpp         // JSON vs 二进制协议延迟对比
+    ├── 02_simd_json.cpp              // SIMD 加速解析
+    └── 03_schema_based_parser.cpp    // 基于 schema 的零拷贝解析
+```
+
+#### 面试问答覆盖
+
+```javascript
+Q: "SIMD 如何加速解析？"
+→ 展示：一次 load 16/32 字节，并行比较、mask、查表
+
+Q: "二进制协议比 JSON 快多少？"
+→ 展示 benchmark 数据（10-50x）
+
+Q: "端序处理为什么重要？"
+→ 网络字节序 vs 主机字节序，bswap 指令
+
+Q: "零拷贝解析怎么做到？"
+→ 映射到预定义 struct 上，不做中间拷贝
+```
+
+__工作量：600-1000 行 C++17 + 少量 intrinsics__\
+__面试价值：7.5/10__（覆盖维度 5、4、2）
+
+---
+
+## 项目对比总表
+
+| 项目 | C++深度 | 量化面试价值 | 代码量 | 业务知识要求 | 难度 | |---|---|---|---|---|---| | __① 无锁数据结构库__ | ★★★★★ | ★★★★★ | 1000-1500 | 0 | ★★★★ | | __② 内存分配器套件__ | ★★★★ | ★★★★ | 800-1200 | 0 | ★★★ | | __③ SIMD 协议解析器__ | ★★★★ | ★★★★ | 600-1000 | 0 | ★★★★ | | __④ 线程池调度器__ | ★★★★ | ★★★ | 600-1000 | 0 | ★★★ | | __⑤ 编译期模板库__ | ★★★★★ | ★★★ | 500-800 | 0 | ★★★★★ | | __⑥ 跨平台 IO 引擎__ | ★★★★ | ★★★ | 1000-1500 | 0 | ★★★ | | __⑦ 零拷贝网络库__ | ★★★★ | ★★★ | 800-1200 | 0 | ★★★★ |
+
+---
+
+## 我的推荐方案
+
+### 最快的路径（约 2 周，面试价值 9/10）
+
+__做项目 ①（无锁数据结构库），附加 benchmark 引擎。__
+
+理由：
+
+1. 这是量化 C++ 面试 __最高频的考题__（无锁队列、内存序、ABA、伪共享）
+2. 零业务知识要求，纯 C++ 技术
+3. benchmark 数据是 __最好的面试讲述素材__——"我做的队列比 std::queue + mutex 快 4 倍，延迟 P50 从 500ns 降到 120ns"
+4. 面试官可以从任何一个代码片段展开深度追问，展示你的功底
+
+### 如果你想做两个项目（3-4 周，面试价值 10/10）
+
+__① 无锁数据结构库 + ② 内存分配器套件__
+
+它们互补：
+
+- ① 展示并发控制能力
+- ② 展示内存管理能力
+- 两者结合 → 你就是面试官眼中"懂底层优化"的候选人
+你最后推荐我的是这些吧，我把记录给你翻出来了，你怎么又提消息框架，我到底该选哪个
