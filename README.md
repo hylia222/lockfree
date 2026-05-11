@@ -20,13 +20,22 @@ cmake --build build --config Release
 
 ## 项目结构
 
+```
 lockfree/
-├── include/
-│   ├── spsc_queue.h     # SPSC 无锁队列
-│   └── utils.h          # 工具宏（CACHE_ALIGNED、PAUSE）
-├── examples/
-│   ├── 02_spsc_demo.cpp     # 使用示例
+│
+├── include/                  # 头文件
+│   ├── spsc_queue.h          # SPSC 无锁队列核心实现
+│   └── utils.h               # 工具宏（CACHE_ALIGNED、PAUSE）
+│
+├── examples/                 # 示例与测试
+│   ├── 01_spsc_demo.cpp      # 最简使用示例
+│   ├── 02_spsc_demo.cpp      # 进阶使用示例
 │   └── 03_spsc_benchmark.cpp # 基准测试
+│
 ├── .gitignore
-└── CMakeLists.txt
-
+├── CMakeLists.txt
+├── README.md
+├── DEVELOPMENT_GUIDE.md      # 开发指南
+├── PREREQUISITES.md          # 环境要求
+└── api.md                    # API 文档
+```
