@@ -5,13 +5,16 @@
 template <typename T, size_t Capacity>
 class SPSCQueue
 {
+    static_assert((Capacity & (Capacity - 1)) == 0,
+                  "Capacity must be a power of 2");
+
 public:
     bool push(const T &item)
     {
         size_t w = write_pos_.load(std::memory_order_acquire);
         size_t r = read_pos_.load(std::memory_order_acquire);
 
-        size_t next_write_pos = (w + 1) % Capacity;
+        size_t next_write_pos = (w + 1) & mask;
         if (next_write_pos == r)
             return false;
         buffer_[w] = item;
@@ -25,7 +28,7 @@ public:
         if (w == r)
             return false;
         item = buffer_[r];
-        read_pos_.store((r + 1) % Capacity, std::memory_order_release);
+        read_pos_.store((r + 1) & mask, std::memory_order_release);
         return true;
     }
 
@@ -33,6 +36,8 @@ private:
     T buffer_[Capacity];
     CACHE_ALIGNED std::atomic<size_t> write_pos_{0};
     CACHE_ALIGNED std::atomic<size_t> read_pos_{0};
+
+    static constexpr size_t mask = Capacity - 1;
 };
 
 //  1 1 1 1 1 1 1 1 1 0 0

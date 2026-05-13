@@ -21,6 +21,9 @@ target_include_directories(lockfree INTERFACE include)
 add_executable(spsc_demo examples/02_spsc_demo.cpp)
 target_link_libraries(spsc_demo lockfree)
 
+add_executable(mpmc_demo examples/04_mpmc_demo.cpp)
+target_link_libraries(mpmc_demo lockfree)
+
 #benchmark
 add_executable(spsc_bench examples/03_spsc_benchmark.cpp)
 target_link_libraries(spsc_bench lockfree)
