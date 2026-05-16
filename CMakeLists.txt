@@ -24,6 +24,14 @@ target_link_libraries(spsc_demo lockfree)
 add_executable(mpmc_demo examples/04_mpmc_demo.cpp)
 target_link_libraries(mpmc_demo lockfree)
 
+#tagged_ptr单元测试
+add_executable(test_tagged_ptr examples/test_tagged_ptr.cpp)
+target_link_libraries(test_tagged_ptr lockfree)
+
+#MSQ demo
+add_executable(msq_demo examples/05_msq_demo.cpp)
+target_link_libraries(msq_demo lockfree)
+
 #benchmark
 add_executable(spsc_bench examples/03_spsc_benchmark.cpp)
 target_link_libraries(spsc_bench lockfree)

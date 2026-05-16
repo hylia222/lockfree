@@ -29,7 +29,7 @@ public:
         size_t pos = write_pos_.load(std::memory_order_relaxed);
         while (true)
         {
-            size_t seq = buffer_[pos & mask_].sequence_.load(std::memory_order_acquire);
+            size_t seq = buffer_[pos & MASK].sequence_.load(std::memory_order_acquire);
 
             intptr_t diff = static_cast<intptr_t>(seq) - static_cast<intptr_t>(pos);
             // printf("[%zu] ---push()---,seq:%zu,pos:%zu,diff:%zd\n",
@@ -55,8 +55,8 @@ public:
                 pos = write_pos_.load(std::memory_order_relaxed);
             }
         }
-        buffer_[pos & mask_].data_ = item;
-        buffer_[pos & mask_].sequence_.store(pos + 1, std::memory_order_release);
+        buffer_[pos & MASK].data_ = item;
+        buffer_[pos & MASK].sequence_.store(pos + 1, std::memory_order_release);
         return true;
     }
     bool pop(T &item)
@@ -65,7 +65,7 @@ public:
         while (true)
         {
 
-            size_t seq = buffer_[pos & mask_].sequence_.load(std::memory_order_relaxed);
+            size_t seq = buffer_[pos & MASK].sequence_.load(std::memory_order_relaxed);
             intptr_t diff = seq - (pos + 1);
             // printf("[%zu] ===pop()===,seq:%zu,pos:%zu,diff:%zd\n",
             //        std::hash<std::thread::id>{}(std::this_thread::get_id()),
@@ -85,8 +85,8 @@ public:
                 pos = read_pos_.load(std::memory_order_relaxed);
             }
         }
-        item = buffer_[pos & mask_].data_;
-        buffer_[pos & mask_].sequence_.store(pos + Capacity, std::memory_order_release);
+        item = buffer_[pos & MASK].data_;
+        buffer_[pos & MASK].sequence_.store(pos + Capacity, std::memory_order_release);
         return true;
     }
 
@@ -95,5 +95,5 @@ private:
     CACHE_ALIGNED std::atomic<size_t> read_pos_;
     CACHE_ALIGNED Cell buffer_[Capacity];
 
-    static constexpr size_t mask_ = Capacity - 1; // 位掩码
+    static constexpr size_t MASK = Capacity - 1; // 位掩码
 };
