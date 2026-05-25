@@ -18,7 +18,7 @@ public:
         if (next_write_pos == r)
             return false;
         buffer_[w] = item;
-        write_pos_.store(next_write_pos, std::memory_order_release);
+        write_pos_.store(next_write_pos, std::memory_order_release); // 让消费者看到 item
         return true;
     }
     bool pop(T &item)
@@ -28,7 +28,7 @@ public:
         if (w == r)
             return false;
         item = buffer_[r];
-        read_pos_.store((r + 1) & MASK, std::memory_order_release);
+        read_pos_.store((r + 1) & MASK, std::memory_order_release); // 通知生产者
         return true;
     }
 

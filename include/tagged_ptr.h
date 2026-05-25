@@ -5,7 +5,7 @@
 // Tagged Pointer — 解决无锁数据结构中的 ABA 问题：
 //   将指针和版本号（tag）打包比较。每次 CAS 时，
 //   ptr 和 tag 一起原子更新。即使地址相同，tag 不同
-//   也能检测到"被人动过"。
+//   也能检测到被动过。
 //
 // 两个版本：
 //   TaggedPtr        — 简单版，ptr 和 tag 分开存
@@ -53,6 +53,7 @@ private:
 // ============================================================
 // 压缩版 TaggedPtr
 // 把 ptr 和 tag 压缩到单个 uintptr_t 中
+// 64 位系统上，用户态地址只用到低 48 位（高 16 位是符号扩展）
 // 适用于 64 位系统（低 48 位地址 + 高 16 位 tag）
 // ============================================================
 template <typename T>
@@ -87,21 +88,6 @@ public:
     {
         return PackedTaggedPtr(ptr(), tag() + 1);
     }
-
-    // static PackedTaggedPtr load(const std::atomic<PackedTaggedPtr> &src,
-    //                             std::memory_order order = std::memory_order_acquire) noexcept
-    // {
-
-    //     return src.load(order);
-    // }
-
-    // static bool compare_exchange(std::atomic<PackedTaggedPtr> &src,
-    //                              PackedTaggedPtr &expected,
-    //                              const PackedTaggedPtr &desired,
-    //                              std::memory_order order = std::memory_order_release) noexcept
-    // {
-    //     return src.compare_exchange_weak(expected, desired, order, std::memory_order_relaxed);
-    // }
 
     explicit operator bool() const noexcept
     {
