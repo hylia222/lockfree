@@ -8,7 +8,7 @@
 #include "mpmc_bounded_queue.h"
 #include "utils.h"
 
-constexpr size_t QUEUE_SIZE = 1024;         // 队列容量
+constexpr size_t QUEUE_SIZE = 16384;         // 队列容量
 constexpr int64_t TOTAL_MSGS = 10'000'000;  // 每轮总消息数
 constexpr int WARMUP_ROUNDS = 2;            // 预热轮数
 constexpr int BENCH_ROUNDS = 10;            // 正式测试轮数
