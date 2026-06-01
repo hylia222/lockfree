@@ -1,5 +1,0 @@
-  [cfg=2P2C] Round -2: 33752.70 us
-  [cfg=2P2C] Round -1: 30455.30 us
-  [cfg=2P2C] Round 0: 33249.80 us
-  [cfg=2P2C] Round 1: 35889.90 us
-  [cfg=2P2C] Round 2: 34057.20 us

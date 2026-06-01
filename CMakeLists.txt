@@ -52,6 +52,10 @@ add_executable(bench_mpmc_unbounded benchmark/bench_mpmc_unbounded.cpp)
 target_include_directories(bench_mpmc_unbounded PRIVATE benchmark)
 target_link_libraries(bench_mpmc_unbounded lockfree)
 
+add_executable(bench_mutex_queue benchmark/bench_mutex_queue.cpp)
+target_include_directories(bench_mutex_queue PRIVATE benchmark)
+target_link_libraries(bench_mutex_queue lockfree)
+
 # ============================================================
 # Google Test (FetchContent)
 # ============================================================
